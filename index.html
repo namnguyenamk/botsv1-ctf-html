@@ -34,7 +34,7 @@
             const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
 
             // 🔥 Đúng endpoint index bạn đã tạo: botsv1_ctf_answers
-            const res = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc", {
+            const res = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
