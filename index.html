@@ -32,19 +32,35 @@
 
             const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
 
-            const res = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "ApiKey " + apiKey
-                },
-                body: JSON.stringify(payload)
-            });
+            // step 1: insert document WITH ingest pipeline
+            const insertRes = await fetch(
+                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "ApiKey " + apiKey
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
 
-            // ===== GIẢI PHÁP INGEST PIPELINE =====
-            const data = await res.json();
+            const insertData = await insertRes.json();
+            const docId = insertData._id;
 
-            if (data._source && data._source.is_correct === true) {
+            // step 2: retrieve the document back to get is_correct
+            const getRes = await fetch(
+                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc/" + docId,
+                {
+                    headers: {
+                        "Authorization": "ApiKey " + apiKey
+                    }
+                }
+            );
+            const doc = await getRes.json();
+
+            // step 3: show result
+            if (doc._source && doc._source.is_correct === true) {
                 document.getElementById("result").innerHTML =
                     "<span style='color: green; font-size: 20px;'>🎉 Correct!</span>";
             } else {
