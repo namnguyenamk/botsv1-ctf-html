@@ -7,7 +7,7 @@
     <h2>Submit your answer</h2>
     <form id="ctfForm">
         <label>Username:</label><br>
-        <input type="text" id="username" value="player1" required><br><br>
+        <input type="text" id="username" value="bots1player" required><br><br>
 
         <label>Question ID:</label><br>
         <input type="text" id="question_id" value="soc1_q1" required><br><br>
@@ -30,8 +30,10 @@
                 player_answer: document.getElementById("player_answer").value
             };
 
-            const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ=="; // Thay API key vào
+            // 🔥 API KEY của bạn
+            const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
 
+            // 🔥 Đúng endpoint index bạn đã tạo: botsv1_ctf_answers
             const res = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc", {
                 method: "POST",
                 headers: {
