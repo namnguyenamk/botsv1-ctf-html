@@ -5,7 +5,6 @@
 </head>
 <body>
     <h2>Submit your answer</h2>
-
     <form id="ctfForm">
         <label>Username:</label><br>
         <input type="text" id="username" value="player1" required><br><br>
@@ -33,44 +32,29 @@
 
             const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
 
-            // Step 1: POST the answer through ingest pipeline
-            const postRes = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "ApiKey " + apiKey
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const postData = await postRes.json();
-            const docId = postData._id;
-
-            if (!docId) {
-                document.getElementById("result").innerHTML =
-                    "<span style='color: red;'>Server error: No document ID returned.</span>";
-                return;
-            }
-
-            // Step 2: GET document lại để lấy is_correct
-            const getRes = await fetch(`https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc/${docId}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "ApiKey " + apiKey
+            const res = await fetch(
+                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "ApiKey " + apiKey
+                    },
+                    body: JSON.stringify(payload)
                 }
-            });
+            );
 
-            const getData = await getRes.json();
+            const data = await res.json();
 
-            if (getData._source && getData._source.is_correct === true) {
+            // CHECK KẾT QUẢ
+            if (data._source && data._source.is_correct === true) {
                 document.getElementById("result").innerHTML =
-                    "<span style='color: green; font-size: 20px;'>🎉 Correct!</span>";
+                    "<span style='color: green; font-size: 22px;'>🎉 Correct!</span>";
             } else {
                 document.getElementById("result").innerHTML =
-                    "<span style='color: red; font-size: 20px;'>❌ Wrong! Try again.</span>";
+                    "<span style='color: red; font-size: 22px;'>❌ Wrong! Try again.</span>";
             }
         });
     </script>
-
 </body>
 </html>
