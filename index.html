@@ -5,6 +5,7 @@
 </head>
 <body>
     <h2>Submit your answer</h2>
+
     <form id="ctfForm">
         <label>Username:</label><br>
         <input type="text" id="username" value="player1" required><br><br>
@@ -32,35 +33,36 @@
 
             const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
 
-            // step 1: insert document WITH ingest pipeline
-            const insertRes = await fetch(
-                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "ApiKey " + apiKey
-                    },
-                    body: JSON.stringify(payload)
+            // Step 1: POST the answer through ingest pipeline
+            const postRes = await fetch("https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "ApiKey " + apiKey
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const postData = await postRes.json();
+            const docId = postData._id;
+
+            if (!docId) {
+                document.getElementById("result").innerHTML =
+                    "<span style='color: red;'>Server error: No document ID returned.</span>";
+                return;
+            }
+
+            // Step 2: GET document lại để lấy is_correct
+            const getRes = await fetch(`https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc/${docId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": "ApiKey " + apiKey
                 }
-            );
+            });
 
-            const insertData = await insertRes.json();
-            const docId = insertData._id;
+            const getData = await getRes.json();
 
-            // step 2: retrieve the document back to get is_correct
-            const getRes = await fetch(
-                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc/" + docId,
-                {
-                    headers: {
-                        "Authorization": "ApiKey " + apiKey
-                    }
-                }
-            );
-            const doc = await getRes.json();
-
-            // step 3: show result
-            if (doc._source && doc._source.is_correct === true) {
+            if (getData._source && getData._source.is_correct === true) {
                 document.getElementById("result").innerHTML =
                     "<span style='color: green; font-size: 20px;'>🎉 Correct!</span>";
             } else {
@@ -69,5 +71,6 @@
             }
         });
     </script>
+
 </body>
 </html>
