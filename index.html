@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>SOC1 - Submit Answer</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        input { padding: 5px; width: 250px; }
+        button { padding: 8px 20px; font-size: 16px; }
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    </style>
 </head>
+
 <body>
     <h2>Submit your answer</h2>
+
     <form id="ctfForm">
         <label>Username:</label><br>
         <input type="text" id="username" value="player1" required><br><br>
@@ -20,41 +29,24 @@
 
     <p id="result"></p>
 
-    <script>
-        document.getElementById("ctfForm").addEventListener("submit", async function(e){
-            e.preventDefault();
+<script>
+document.getElementById("ctfForm").addEventListener("submit", function(e){
+    e.preventDefault();
 
-            const payload = {
-                username: document.getElementById("username").value,
-                question_id: document.getElementById("question_id").value,
-                player_answer: document.getElementById("player_answer").value
-            };
+    // === Bạn chỉnh giá trị đúng của câu hỏi tại đây ===
+    const correct_answer = "209.35.99.117";
 
-            const apiKey = "QnJXcW9wb0JGTlFTdVRzMlhEMHk6U2daSUEzdGRSRVNNOTgyeWtOQVk1UQ==";
+    let user_answer = document.getElementById("player_answer").value.trim();
 
-            const res = await fetch(
-                "https://xdrview.dc.turkuamk.fi:9200/botsv1_ctf_answers/_doc?pipeline=ctf_answer_checker",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "ApiKey " + apiKey
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+    if (user_answer === correct_answer) {
+        document.getElementById("result").innerHTML =
+            "<span style='color: green;'>🎉 Correct!</span>";
+    } else {
+        document.getElementById("result").innerHTML =
+            "<span style='color: red;'>❌ Wrong! Try again.</span>";
+    }
+});
+</script>
 
-            const data = await res.json();
-
-            // CHECK KẾT QUẢ
-            if (data._source && data._source.is_correct === true) {
-                document.getElementById("result").innerHTML =
-                    "<span style='color: green; font-size: 22px;'>🎉 Correct!</span>";
-            } else {
-                document.getElementById("result").innerHTML =
-                    "<span style='color: red; font-size: 22px;'>❌ Wrong! Try again.</span>";
-            }
-        });
-    </script>
 </body>
 </html>
