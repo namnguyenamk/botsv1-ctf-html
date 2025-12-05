@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SOC1 - Level 1</title>
+
+    <style>
+        body { font-family: Arial; background: #fafafa; padding: 40px; }
+        .box {
+            background: white; padding: 25px; border-radius: 10px;
+            width: 450px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        input { width: 95%; padding: 10px; margin-top: 10px; }
+        button { width: 100%; padding: 12px; margin-top: 15px; background: #007bff; color:white;}
+        #result { margin-top: 20px; text-align:center; font-size: 18px; }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>SOC1 - Level 1</h2>
+    <p id="questionText">Loading question...</p>
+
+    <input type="text" id="answerInput" placeholder="Enter your answer">
+    <button onclick="submitAnswer()">Submit</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+const backend = "https://web-production-4a8be.up.railway.app";
+const questionId = 3;   // PAGE Q1
+
+// Load câu hỏi
+fetch(`${backend}/question/${questionId}`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("questionText").innerText = data.question;
+    });
+
+function submitAnswer() {
+    const input = document.getElementById("answerInput").value.trim();
+
+    fetch(`${backend}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            question_id: questionId,
+            answer: input
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.correct) {
+            document.getElementById("result").innerHTML = "<span style='color:green;'>Correct! 🎉</span>";
+
+            setTimeout(() => {
+                window.location.href = "q4.html";   // NEXT PAGE
+            }, 1500);
+
+        } else {
+            document.getElementById("result").innerHTML = "<span style='color:red;'>Wrong ❌ Try again.</span>";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
