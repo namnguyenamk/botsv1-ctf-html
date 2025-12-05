@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SOC1 CTF - Completed</title>
+
+    <style>
+        body { background: #f2f2f2; font-family: Arial; text-align: center; }
+        .box {
+            width: 550px; background: white; margin: auto; margin-top: 70px;
+            padding: 35px; border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2)
+        }
+        h1 { color: green; }
+        .score { font-size: 1.4rem; font-weight: bold; margin-top: 15px; }
+        .btn {
+            margin-top: 25px; padding: 12px 20px;
+            background: blue; color: white; border: none; border-radius: 6px;
+            font-size: 17px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>🎉 Congratulations! 🎉</h1>
+    <h2>You Completed All Challenges</h2>
+
+    <p id="player"></p>
+    <p class="score">Your score: <span id="score"></span> / 5</p>
+    <p id="time"></p>
+
+    <button class="btn" onclick="window.location.href='q1.html'">Play Again</button>
+</div>
+
+<script>
+const API_ENDPOINT = "https://web-production-4a8be.up.railway.app";
+
+// Nếu sau này bạn có login player, set localStorage player_name
+// tạm thời chưa có => dùng IP để lưu
+let playerName = localStorage.getItem("player_name") || "Unknown Player";
+
+// score đã lưu trong localStorage từ q5.html
+let score = localStorage.getItem("ctf_score") || 5;
+let time = localStorage.getItem("ctf_time") || "Unknown Time";
+
+// hiển thị
+document.getElementById("player").innerText = "👤 Player: " + playerName;
+document.getElementById("score").innerText = score;
+document.getElementById("time").innerText = "⏱ Completed in: " + time;
+
+// GỬI LÊN ELASTIC để LÀM RANKING
+async function sendRanking() {
+    await fetch(`${API_ENDPOINT}/ranking`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            player: playerName,
+            score: score,
+            time: time
+        })
+    });
+}
+sendRanking();
+</script>
+
+</body>
+</html>
