@@ -5,64 +5,58 @@
     <title>SOC1 - Level 1</title>
 
     <style>
-        body { font-family: Arial; background: #fafafa; padding: 40px; }
-        .box {
-            background: white; padding: 25px; border-radius: 10px;
-            width: 450px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        input { width: 95%; padding: 10px; margin-top: 10px; }
-        button { width: 100%; padding: 12px; margin-top: 15px; background: #007bff; color:white;}
-        #result { margin-top: 20px; text-align:center; font-size: 18px; }
+        body { font-family: Arial; background: #f2f2f2; }
+        .box { width: 450px; background: white; margin: auto; padding: 25px; 
+               border-radius: 10px; margin-top: 80px; box-shadow: 0 0 10px rgba(0,0,0,0.2);}
+        input { width: 90%; padding: 10px; margin-top: 10px; }
+        button { width: 95%; padding: 12px; background: blue; color: white; font-size: 16px;
+                 border: none; margin-top: 15px; cursor:.pointer;}
+        #result { margin-top: 15px; font-size: 18px; }
     </style>
 </head>
-
 <body>
 
 <div class="box">
     <h2>SOC1 - Level 1</h2>
-    <p id="questionText">Loading question...</p>
+    <h4 id="questionText">Loading question...</h4>
 
-    <input type="text" id="answerInput" placeholder="Enter your answer">
+    <input id="answerInput" type="text" placeholder="Enter your answer"/>
     <button onclick="submitAnswer()">Submit</button>
 
     <div id="result"></div>
 </div>
 
 <script>
-const backend = "https://web-production-4a8be.up.railway.app";
-const questionId = 2;   // PAGE Q1
+const API_ENDPOINT = "https://web-production-4a8be.up.railway.app";
+const QUESTION_ID = 2;
+const NEXT_PAGE = 3;
 
-// Load câu hỏi
-fetch(`${backend}/question/${questionId}`)
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("questionText").innerText = data.question;
-    });
+async function loadQuestion() {
+    const res = await fetch(`${API_ENDPOINT}/question/${QUESTION_ID}`);
+    const data = await res.json();
+    document.getElementById("questionText").innerText = data.question;
+}
+loadQuestion();
 
-function submitAnswer() {
-    const input = document.getElementById("answerInput").value.trim();
-
-    fetch(`${backend}/submit`, {
+async function submitAnswer() {
+    const answer = document.getElementById("answerInput").value.trim();
+    const res = await fetch(`${API_ENDPOINT}/submit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            question_id: questionId,
-            answer: input
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.correct) {
-            document.getElementById("result").innerHTML = "<span style='color:green;'>Correct! 🎉</span>";
-
-            setTimeout(() => {
-                window.location.href = "q3.html";   // NEXT PAGE
-            }, 1500);
-
-        } else {
-            document.getElementById("result").innerHTML = "<span style='color:red;'>Wrong ❌ Try again.</span>";
-        }
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question_id: QUESTION_ID, answer: answer })
     });
+
+    const data = await res.json();
+    const resultDiv = document.getElementById("result");
+
+    if (data.correct) {
+        resultDiv.innerHTML = "🎉 Correct! Moving next...";
+        setTimeout(() => {
+            window.location.href = `q${NEXT_PAGE}.html`;
+        }, 1500);
+    } else {
+        resultDiv.innerHTML = "❌ Wrong! Try again.";
+    }
 }
 </script>
 
