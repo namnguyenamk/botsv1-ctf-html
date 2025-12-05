@@ -18,6 +18,10 @@
             background: blue; color: white; border: none; border-radius: 6px;
             font-size: 17px; cursor: pointer;
         }
+        .btn-green {
+            background: darkgreen;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -31,35 +35,37 @@
     <p id="time"></p>
 
     <button class="btn" onclick="window.location.href='q1.html'">Play Again</button>
+    <button class="btn btn-green" onclick="window.location.href='ranking.html'">View Ranking</button>
 </div>
 
 <script>
 const API_ENDPOINT = "https://web-production-4a8be.up.railway.app";
 
-// Nếu sau này bạn có login player, set localStorage player_name
-// tạm thời chưa có => dùng IP để lưu
+// Lấy local storage
 let playerName = localStorage.getItem("player_name") || "Unknown Player";
-
-// score đã lưu trong localStorage từ q5.html
 let score = localStorage.getItem("ctf_score") || 5;
 let time = localStorage.getItem("ctf_time") || "Unknown Time";
 
-// hiển thị
+// Hiển thị dữ liệu
 document.getElementById("player").innerText = "👤 Player: " + playerName;
 document.getElementById("score").innerText = score;
-document.getElementById("time").innerText = "⏱ Completed in: " + time;
+document.getElementById("time").innerText = "⏱ Completed: " + time;
 
-// GỬI LÊN ELASTIC để LÀM RANKING
+// Gửi điểm lên Backend -> Elastic
 async function sendRanking() {
-    await fetch(`${API_ENDPOINT}/ranking`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            player: playerName,
-            score: score,
-            time: time
-        })
-    });
+    try {
+        await fetch(`${API_ENDPOINT}/finish`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                username: playerName,
+                score: score,
+                finished_time: time
+            })
+        });
+    } catch (err) {
+        console.log("Error sending ranking:", err);
+    }
 }
 sendRanking();
 </script>
