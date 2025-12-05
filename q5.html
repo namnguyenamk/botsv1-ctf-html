@@ -2,25 +2,35 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>SOC1 - Level 1</title>
+    <title>SOC1 - Level 5</title>
 
     <style>
-        body { font-family: Arial; background: #f2f2f2; }
-        .box { width: 450px; background: white; margin: auto; padding: 25px; 
-               border-radius: 10px; margin-top: 80px; box-shadow: 0 0 10px rgba(0,0,0,0.2);}
-        input { width: 90%; padding: 10px; margin-top: 10px; }
-        button { width: 95%; padding: 12px; background: blue; color: white; font-size: 16px;
-                 border: none; margin-top: 15px; cursor:.pointer;}
-        #result { margin-top: 15px; font-size: 18px; }
+        body { background: #f4f4f4; font-family: Arial; }
+        .container {
+            width: 450px; background: white; padding: 30px;
+            border-radius: 12px; margin: auto; margin-top: 60px;
+            text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        input {
+            width: 85%; padding: 12px; margin-top: 15px; font-size: 16px;
+        }
+        button {
+            padding: 12px; width: 90%;
+            margin-top: 20px;
+            background: #007bff; color: white;
+            border: none; cursor: pointer; border-radius: 7px;
+            font-size: 18px;
+        }
+        #result { margin-top: 15px; font-size: 20px; font-weight: bold; }
     </style>
 </head>
+
 <body>
+<div class="container">
+    <h2>SOC1 - Level 5</h2>
+    <p id="question"></p>
 
-<div class="box">
-    <h2>SOC1 - Level 1</h2>
-    <h4 id="questionText">Loading question...</h4>
-
-    <input id="answerInput" type="text" placeholder="Enter your answer"/>
+    <input id="answerInput" type="text" placeholder="Enter your answer">
     <button onclick="submitAnswer()">Submit</button>
 
     <div id="result"></div>
@@ -28,33 +38,44 @@
 
 <script>
 const API_ENDPOINT = "https://web-production-4a8be.up.railway.app";
-const QUESTION_ID = 5;
-#const NEXT_PAGE = 3;
 
+// Load Question
 async function loadQuestion() {
-    const res = await fetch(`${API_ENDPOINT}/question/${QUESTION_ID}`);
+    const res = await fetch(`${API_ENDPOINT}/question/5`);
     const data = await res.json();
-    document.getElementById("questionText").innerText = data.question;
+    document.getElementById("question").innerText = data.question;
 }
 loadQuestion();
 
+// Submit Answer
 async function submitAnswer() {
     const answer = document.getElementById("answerInput").value.trim();
+    if (!answer) return;
+
     const res = await fetch(`${API_ENDPOINT}/submit`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ question_id: QUESTION_ID, answer: answer })
+        body: JSON.stringify({ question_id: 5, answer: answer })
     });
 
     const data = await res.json();
-    const resultDiv = document.getElementById("result");
 
     if (data.correct) {
-    resultDiv.innerHTML = "🎉 CONGRATULATIONS — You finished all SOC1 Challenges!";
-} else {
-    resultDiv.innerHTML = "❌ Wrong! Try again.";
-}
+        document.getElementById("result").innerHTML = "<span style='color:green'>✔ Correct!</span>";
 
+        // SAVE RESULT — SCORE = 5
+        localStorage.setItem("ctf_score", 5);
+        localStorage.setItem("ctf_time", new Date().toLocaleString());
+
+        // NEXT — DONE PAGE
+        setTimeout(() => {
+            window.location.href = "done.html";
+        }, 1500);
+
+    } else {
+        document.getElementById("result").innerHTML = "<span style='color:red'>✖ Wrong! Try again.</span>";
+    }
+}
 </script>
 
 </body>
